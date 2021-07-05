@@ -1,0 +1,105 @@
+  Author: Matthew Thomas
+    Date: 5/2/2019
+Contains: Design details for CSCI E-215 homework 6
+==================================================
+Project: wsng
+
+Purpose: Implement a limited feature-set for a web server.
+
+Outline:
+	The goal for the wsng assignment was to add eight features to a subset
+	of a fully-featured webserver. Included in the starter code was the basics
+	to establish a connect, handle incoming requests, and do some simple
+	parsing for some features. This submission expands on those features and
+	adds the following:
+		1) Better reply headers
+		2) HEAD support
+		3) Table-driven file types
+		4) Directory listing with links
+		5) index.html/index.cgi support
+		6) Added 403 error handling
+		7) Handle zombie processes
+		8) QUERY_STRING support
+
+Program flow:
+	The basic flow of the web server was already included in the starter code.
+	It picks a port number to run on, creates a socket, and then listens for
+	requests. Each request is passed to handle_call() which forks into a child
+	process that handles the request, according to a variety of built-in
+	functions.
+	
+	The new built-in functions/features added for this assignment are described
+	individually below.
+
+Reply Headers:
+	To improve the reply headers, the header() function was updated to output
+	both the Date and the server Name/Version. Content-Type support was also
+	changed so that if one is not specified, it will output a #defined default.
+	
+HEAD support:
+	The original code only supported GET requests. wsng supports both GET and
+	HEAD requests and sets the REQUEST_METHOD environment variable
+	accordingly. A CGI script is responsible for detecting what type of
+	request was made and only output header information if the request is of
+	type HEAD.
+
+Table-driven file types (configuration file):
+	Content-Types can be specified in the wsng.conf file that is loaded when
+	the server starts up. A configuration file can include three different
+	parameters: "server_root", "port", and "type". The part added for wsng
+	was the "type" parameter which takes the form
+				type	file_extension		content_type
+				type	jpg					image/jpeg
+	A config file is loaded by calling process_config_file() which then calls
+	read_param() for each line in the file. read_param() will read either 2
+	or 3 variables in using sscanf(). If the parameter is type "type", and 3
+	variables were read in, process_config_type() will call on the VLstore()
+	function from varlib.c to store the "val" and "type" parameters to
+	correspond with "file_extension" and "content_type".
+
+Directory listing:
+	To output the directory listing, concepts and some code from the earlier
+	pfind assignment was used. The idea is to open the directory and iterate
+	through each file using readdir(), and format the output accordingly. A
+	special-case is included where if the file is a directory (meaning the
+	link would resolve to a subdirectory), an extra '/' is added to the <a>
+	tag.
+
+Index page:
+	As described in the assignment, when an "index" file exists in a
+	directory, that file should be rendered instead of the directory listing.
+	wsng first checks whether an "index.html" exists using stat(). If it
+	does, do_cat() is called. If not, it then checks for an "index.cgi" file
+	and calls do_exec() if true. If neither of those index files exists, it
+	continues with a regular directory listing from do_ls().
+
+403 handling:
+	A 403 HTTP code is "Forbidden". When a file exists, but the end-user
+	browsing the website does not have access to view it, a 403 error is
+	returned. This is done using the no_access() helper function that calls
+	stat() and checks if the mode has read/execution USR privileges with the
+	S_IRUSR and S_IXUSR macros.
+
+Zombie process:
+	To deal with zombie process, a SIGCHLD handler is added during the server
+	startup. 
+
+QUERY_STRING:
+	When processing the request, the argument is first sanitized using
+	modify_argument() and then passed to parse_query. QUERY_STRING should be
+	set for each request, regardless of if a query was included. parse_query()
+	uses strrchr() to find a '?', if any, and stores the portion of the string
+	located at that index +1. parse_query() then terminates the request at the
+	'?' and returns that back to be handled by process_rq().
+
+Error handling:
+	wsng deals with two types of errors, handled with fatal() and oops().
+	
+	fatal() deals with a missing config file, or problems with opening the
+	specified config file. If this error occurs, a message is displayed and
+	the program exits.
+	
+	oops() follows a similar process -- display error message and exit -- but
+	does so when making a socket fails, the server cannot change into the
+	root directory specified in the config file, or if malloc() fails when
+	trying to sanitize the request argument.

@@ -1,0 +1,31 @@
+README for wsng
+
+  Student: Matthew Thomas
+  Date: 5/2/2019
+
+Summary:
+
+This submission contains the files:
+         Makefile -- The Makefile
+           README -- This file
+             Plan -- Design document for this assignment
+     my_script.sh -- My sample test script, to compile wsng
+           wsng.c -- Core logic for web server
+        wsng.conf -- Header file for smsh.c
+       web-time.c -- Displays formatted times; function added to starter code
+        socklib.c -- Unmodified from starter code
+        socklib.h -- Unmodified from starter code
+         varlib.c -- Copied from smsh assignment; unmodified
+         varlib.h -- Copied from smsh assignment; unmodified
+       typescript -- Run of my_script to show program compiles with no errors
+         
+
+Notes:
+    A few files were taken from the sample code for this assignment, and
+    untouched by me. These are noted above in this README file. The code added
+    for the assignment is contained within wsng.c. All changes and additions
+    were made by me.
+    
+    I wrote my code using a combination of BBEdit on the Mac, and server-side
+    editing using Emacs. Indentation is 4-space wide tabs. Before submission,
+    I ran the Emacs command 'M-x untabify' to convert tabs to spaces.

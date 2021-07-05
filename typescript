@@ -1,0 +1,12 @@
+Script started on Thu 02 May 2019 05:29:06 PM EDT
+mst611@ice2:~/csci28/wsng-hw$ ./my_script.sh [K[K[K[K[K[K[K[K[K[K[K[K[K[K[Ksh -[K[K[K[K./my_script.sh 
+rm -f *.o core wsng
+gcc -Wall    -c -o wsng.o wsng.c
+gcc -Wall    -c -o socklib.o socklib.c
+gcc -Wall    -c -o web-time.o web-time.c
+gcc -Wall    -c -o varlib.o varlib.c
+gcc -Wall -o wsng wsng.o socklib.o web-time.o varlib.o
+mst611@ice2:~/csci28/wsng-hw$ exit
+exit
+
+Script done on Thu 02 May 2019 05:29:23 PM EDT
